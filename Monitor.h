@@ -3,16 +3,25 @@
 
 class Monitor {
 private:
-    // Store previous CPU time snapshots as member variables
+    // Previous CPU time snapshots
     FILETIME prevIdle;
     FILETIME prevKernel;
     FILETIME prevUser;
 
+    // Current readings
     double cpuUsage;
     double memUsage;
 
+    // Thresholds
+    double cpuLimit;
+    double memLimit;
+
+    // Alert flags
+    bool cpuAlert;
+    bool memAlert;
+
 public:
-    Monitor();              // Constructor — sets everything to zero
-    void sample();          // Takes one reading of CPU + Memory
-    void printStats();      // Prints the results to console
+    Monitor(double cpuLimit, double memLimit); // Constructor with parameters
+    void sample();
+    void printStats();
 };

@@ -2,16 +2,21 @@
 #include <iostream>
 #include <psapi.h>
 
-// Constructor — initialize all member variables to zero
-Monitor::Monitor() {
+Monitor::Monitor(double cpuLimit, double memLimit) {
     ZeroMemory(&prevIdle,   sizeof(FILETIME));
     ZeroMemory(&prevKernel, sizeof(FILETIME));
     ZeroMemory(&prevUser,   sizeof(FILETIME));
+
     cpuUsage = 0.0;
     memUsage = 0.0;
+
+    this->cpuLimit = cpuLimit;
+    this->memLimit = memLimit;
+
+    cpuAlert = false;
+    memAlert = false;
 }
 
-// Helper to convert FILETIME to unsigned long long
 static unsigned long long toULL(FILETIME ft) {
     return (static_cast<unsigned long long>(ft.dwHighDateTime) << 32)
          | ft.dwLowDateTime;
@@ -39,10 +44,20 @@ void Monitor::sample() {
     memStatus.dwLength = sizeof(memStatus);
     if (GlobalMemoryStatusEx(&memStatus))
         memUsage = static_cast<double>(memStatus.dwMemoryLoad);
+
+    // ── Check thresholds ─────────────────────────────
+    cpuAlert = (cpuUsage > cpuLimit);
+    memAlert = (memUsage > memLimit);
 }
 
 void Monitor::printStats() {
     std::cout << "CPU Usage:    " << cpuUsage << "%" << std::endl;
+    if (cpuAlert)
+        std::cout << "WARNING: CPU usage is high! (" << cpuUsage << "%)" << std::endl;
+
     std::cout << "Memory Usage: " << memUsage << "%" << std::endl;
+    if (memAlert)
+        std::cout << "WARNING: Memory usage is high! (" << memUsage << "%)" << std::endl;
+
     std::cout << "-------------------------" << std::endl;
 }
