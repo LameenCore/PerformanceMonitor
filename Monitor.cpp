@@ -1,8 +1,10 @@
 #include "Monitor.h"
 #include <iostream>
+#include <fstream>
+#include <ctime>
 #include <psapi.h>
 
-Monitor::Monitor(double cpuLimit, double memLimit) {
+Monitor::Monitor(double cpuLimit, double memLimit, std::string logFileName) {
     ZeroMemory(&prevIdle,   sizeof(FILETIME));
     ZeroMemory(&prevKernel, sizeof(FILETIME));
     ZeroMemory(&prevUser,   sizeof(FILETIME));
@@ -10,8 +12,9 @@ Monitor::Monitor(double cpuLimit, double memLimit) {
     cpuUsage = 0.0;
     memUsage = 0.0;
 
-    this->cpuLimit = cpuLimit;
-    this->memLimit = memLimit;
+    this->cpuLimit     = cpuLimit;
+    this->memLimit     = memLimit;
+    this->logFileName  = logFileName;
 
     cpuAlert = false;
     memAlert = false;
@@ -60,4 +63,31 @@ void Monitor::printStats() {
         std::cout << "WARNING: Memory usage is high! (" << memUsage << "%)" << std::endl;
 
     std::cout << "-------------------------" << std::endl;
+}
+
+void Monitor::log() {
+    // Get current time
+    time_t now = time(0);
+    tm* localTime = localtime(&now);
+
+    char timestamp[20];
+    strftime(timestamp, sizeof(timestamp), "%H:%M:%S", localTime);
+
+    // Open file in append mode
+    std::ofstream logFile(logFileName, std::ios::app);
+    if (!logFile.is_open()) {
+        std::cout << "ERROR: Could not open log file." << std::endl;
+        return;
+    }
+
+    // Write the reading
+    logFile << "[" << timestamp << "] "
+            << "CPU: " << cpuUsage << "% | "
+            << "Memory: " << memUsage << "%";
+
+    if (cpuAlert) logFile << " | WARNING: CPU high!";
+    if (memAlert) logFile << " | WARNING: Memory high!";
+
+    logFile << std::endl;
+    logFile.close();
 }

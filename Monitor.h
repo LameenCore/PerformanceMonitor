@@ -1,27 +1,27 @@
 #pragma once
 #include <windows.h>
+#include <string>
 
 class Monitor {
 private:
-    // Previous CPU time snapshots
     FILETIME prevIdle;
     FILETIME prevKernel;
     FILETIME prevUser;
 
-    // Current readings
     double cpuUsage;
     double memUsage;
 
-    // Thresholds
     double cpuLimit;
     double memLimit;
 
-    // Alert flags
     bool cpuAlert;
     bool memAlert;
 
+    std::string logFileName; // Name of the log file
+
 public:
-    Monitor(double cpuLimit, double memLimit); // Constructor with parameters
+    Monitor(double cpuLimit, double memLimit, std::string logFileName = "monitor.log");
     void sample();
     void printStats();
+    void log(); // New — saves current reading to file
 };
