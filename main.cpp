@@ -2,23 +2,50 @@
 #include <thread>
 #include <chrono>
 #include "Monitor.h"
+#include "SessionReport.h"
 
 int main() {
     std::cout << "=== Smart App Performance Monitor ===" << std::endl;
-    std::cout << "Logging to monitor.log" << std::endl;
-    std::cout << "Sampling every 1 second. Press Ctrl+C to stop.\n" << std::endl;
+    std::cout << "1. Run Monitor" << std::endl;
+    std::cout << "2. Compare Two Sessions" << std::endl;
+    std::cout << "Choose (1 or 2): ";
 
-    Monitor monitor(80.0, 85.0);
+    int choice;
+    std::cin >> choice;
 
-    // Seed baseline
-    monitor.sample();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    if (choice == 1) {
+        std::cout << "\nLogging to monitor.log" << std::endl;
+        std::cout << "Sampling every 1 second. Press Ctrl+C to stop.\n" << std::endl;
 
-    while (true) {
+        Monitor monitor(80.0, 85.0);
         monitor.sample();
-        monitor.printStats();
-        monitor.log(); // Save to file
         std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        while (true) {
+            monitor.sample();
+            monitor.printStats();
+            monitor.log();
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+    else if (choice == 2) {
+        std::string file1, file2;
+        std::cout << "\nEnter first log file name:  ";
+        std::cin >> file1;
+        std::cout << "Enter second log file name: ";
+        std::cin >> file2;
+
+        SessionReport s1(file1);
+        SessionReport s2(file2);
+
+        s1.parse();
+        s2.parse();
+
+        std::cout << "\n===== Session 1 =====" << std::endl;
+        s1.print();
+
+        std::cout << "\n===== Session 2 =====" << std::endl;
+        s2.print();
     }
 
     return 0;
