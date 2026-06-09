@@ -17,11 +17,18 @@ private:
     bool cpuAlert;
     bool memAlert;
 
-    std::string logFileName; // Name of the log file
+    std::string logFileName;
 
 public:
     Monitor(double cpuLimit, double memLimit, std::string logFileName = "monitor.log");
     void sample();
     void printStats();
-    void log(); // New — saves current reading to file
+    void log();
+
+    // Getters — so BottleneckReport can read the values
+    double      getCpu()       { return cpuUsage; }
+    double      getMem()       { return memUsage; }
+    bool        isCpuAlert()   { return cpuAlert; }
+    bool        isMemAlert()   { return memAlert; }
+    std::string getTimestamp();
 };

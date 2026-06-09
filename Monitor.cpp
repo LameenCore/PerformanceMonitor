@@ -12,9 +12,9 @@ Monitor::Monitor(double cpuLimit, double memLimit, std::string logFileName) {
     cpuUsage = 0.0;
     memUsage = 0.0;
 
-    this->cpuLimit     = cpuLimit;
-    this->memLimit     = memLimit;
-    this->logFileName  = logFileName;
+    this->cpuLimit    = cpuLimit;
+    this->memLimit    = memLimit;
+    this->logFileName = logFileName;
 
     cpuAlert = false;
     memAlert = false;
@@ -26,7 +26,6 @@ static unsigned long long toULL(FILETIME ft) {
 }
 
 void Monitor::sample() {
-    // ── CPU ──────────────────────────────────────────
     FILETIME idle, kernel, user;
     if (GetSystemTimes(&idle, &kernel, &user)) {
         unsigned long long idleDiff   = toULL(idle)   - toULL(prevIdle);
@@ -42,13 +41,11 @@ void Monitor::sample() {
             cpuUsage = (static_cast<double>(total - idleDiff) / total) * 100.0;
     }
 
-    // ── Memory ───────────────────────────────────────
     MEMORYSTATUSEX memStatus;
     memStatus.dwLength = sizeof(memStatus);
     if (GlobalMemoryStatusEx(&memStatus))
         memUsage = static_cast<double>(memStatus.dwMemoryLoad);
 
-    // ── Check thresholds ─────────────────────────────
     cpuAlert = (cpuUsage > cpuLimit);
     memAlert = (memUsage > memLimit);
 }
@@ -66,21 +63,18 @@ void Monitor::printStats() {
 }
 
 void Monitor::log() {
-    // Get current time
     time_t now = time(0);
     tm* localTime = localtime(&now);
 
     char timestamp[20];
     strftime(timestamp, sizeof(timestamp), "%H:%M:%S", localTime);
 
-    // Open file in append mode
     std::ofstream logFile(logFileName, std::ios::app);
     if (!logFile.is_open()) {
         std::cout << "ERROR: Could not open log file." << std::endl;
         return;
     }
 
-    // Write the reading
     logFile << "[" << timestamp << "] "
             << "CPU: " << cpuUsage << "% | "
             << "Memory: " << memUsage << "%";
@@ -90,4 +84,12 @@ void Monitor::log() {
 
     logFile << std::endl;
     logFile.close();
+}
+
+std::string Monitor::getTimestamp() {
+    time_t now = time(0);
+    tm* localTime = localtime(&now);
+    char timestamp[20];
+    strftime(timestamp, sizeof(timestamp), "%H:%M:%S", localTime);
+    return std::string(timestamp);
 }
