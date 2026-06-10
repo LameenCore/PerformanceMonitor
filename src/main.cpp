@@ -2,9 +2,9 @@
 #include <thread>
 #include <chrono>
 #include <csignal>
-#include "Monitor.h"
-#include "SessionReport.h"
-#include "BottleneckReport.h"
+#include "../include/Monitor.h"
+#include "../include/SessionReport.h"
+#include "../include/BottleneckReport.h"
 
 // Global flag — signal handler sets this to false on Ctrl+C
 bool running = true;

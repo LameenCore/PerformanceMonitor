@@ -1,4 +1,4 @@
-#include "SessionReport.h"
+#include "../include/SessionReport.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>

@@ -1,4 +1,4 @@
-#include "Monitor.h"
+#include "../include/Monitor.h"
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -51,14 +51,40 @@ void Monitor::sample() {
 }
 
 void Monitor::printStats() {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    // CPU color: green < 50%, yellow < 80%, red >= 80%
+    if (cpuUsage >= cpuLimit)
+        SetConsoleTextAttribute(hConsole, 12); // red
+    else if (cpuUsage >= cpuLimit * 0.75)
+        SetConsoleTextAttribute(hConsole, 14); // yellow
+    else
+        SetConsoleTextAttribute(hConsole, 10); // green
+
     std::cout << "CPU Usage:    " << cpuUsage << "%" << std::endl;
-    if (cpuAlert)
-        std::cout << "WARNING: CPU usage is high! (" << cpuUsage << "%)" << std::endl;
+
+    // Memory color
+    if (memUsage >= memLimit)
+        SetConsoleTextAttribute(hConsole, 12); // red
+    else if (memUsage >= memLimit * 0.75)
+        SetConsoleTextAttribute(hConsole, 14); // yellow
+    else
+        SetConsoleTextAttribute(hConsole, 10); // green
 
     std::cout << "Memory Usage: " << memUsage << "%" << std::endl;
-    if (memAlert)
-        std::cout << "WARNING: Memory usage is high! (" << memUsage << "%)" << std::endl;
 
+    // Warnings in red
+    if (cpuAlert) {
+        SetConsoleTextAttribute(hConsole, 12);
+        std::cout << "WARNING: CPU usage is high! (" << cpuUsage << "%)" << std::endl;
+    }
+    if (memAlert) {
+        SetConsoleTextAttribute(hConsole, 12);
+        std::cout << "WARNING: Memory usage is high! (" << memUsage << "%)" << std::endl;
+    }
+
+    // Reset to white
+    SetConsoleTextAttribute(hConsole, 7);
     std::cout << "-------------------------" << std::endl;
 }
 

@@ -1,4 +1,4 @@
-#include "BottleneckReport.h"
+#include "../include/BottleneckReport.h"
 #include <iostream>
 
 BottleneckReport::BottleneckReport() {
