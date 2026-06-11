@@ -2,6 +2,11 @@
 #include <windows.h>
 #include <string>
 
+struct ProcessInfo {
+    std::string name;
+    double memoryMB;
+};
+
 class Monitor {
 private:
     FILETIME prevIdle;
@@ -18,14 +23,15 @@ private:
     bool memAlert;
 
     std::string logFileName;
+    ProcessInfo topProcess;
 
 public:
     Monitor(double cpuLimit, double memLimit, std::string logFileName = "monitor.log");
     void sample();
     void printStats();
     void log();
+    void sampleTopProcess();
 
-    // Getters — so BottleneckReport can read the values
     double      getCpu()       { return cpuUsage; }
     double      getMem()       { return memUsage; }
     bool        isCpuAlert()   { return cpuAlert; }

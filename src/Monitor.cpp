@@ -18,6 +18,9 @@ Monitor::Monitor(double cpuLimit, double memLimit, std::string logFileName) {
 
     cpuAlert = false;
     memAlert = false;
+
+    topProcess.name     = "Unknown";
+    topProcess.memoryMB = 0.0;
 }
 
 static unsigned long long toULL(FILETIME ft) {
@@ -53,27 +56,27 @@ void Monitor::sample() {
 void Monitor::printStats() {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-    // CPU color: green < 50%, yellow < 80%, red >= 80%
+    // CPU color
     if (cpuUsage >= cpuLimit)
-        SetConsoleTextAttribute(hConsole, 12); // red
+        SetConsoleTextAttribute(hConsole, 12);
     else if (cpuUsage >= cpuLimit * 0.75)
-        SetConsoleTextAttribute(hConsole, 14); // yellow
+        SetConsoleTextAttribute(hConsole, 14);
     else
-        SetConsoleTextAttribute(hConsole, 10); // green
+        SetConsoleTextAttribute(hConsole, 10);
 
     std::cout << "CPU Usage:    " << cpuUsage << "%" << std::endl;
 
     // Memory color
     if (memUsage >= memLimit)
-        SetConsoleTextAttribute(hConsole, 12); // red
+        SetConsoleTextAttribute(hConsole, 12);
     else if (memUsage >= memLimit * 0.75)
-        SetConsoleTextAttribute(hConsole, 14); // yellow
+        SetConsoleTextAttribute(hConsole, 14);
     else
-        SetConsoleTextAttribute(hConsole, 10); // green
+        SetConsoleTextAttribute(hConsole, 10);
 
     std::cout << "Memory Usage: " << memUsage << "%" << std::endl;
 
-    // Warnings in red
+    // Warnings
     if (cpuAlert) {
         SetConsoleTextAttribute(hConsole, 12);
         std::cout << "WARNING: CPU usage is high! (" << cpuUsage << "%)" << std::endl;
@@ -82,6 +85,11 @@ void Monitor::printStats() {
         SetConsoleTextAttribute(hConsole, 12);
         std::cout << "WARNING: Memory usage is high! (" << memUsage << "%)" << std::endl;
     }
+
+    // Top process in cyan
+    SetConsoleTextAttribute(hConsole, 11);
+    std::cout << "Top Process:  " << topProcess.name
+          << " - Memory: " << topProcess.memoryMB << " MB" << std::endl;
 
     // Reset to white
     SetConsoleTextAttribute(hConsole, 7);
@@ -118,4 +126,50 @@ std::string Monitor::getTimestamp() {
     char timestamp[20];
     strftime(timestamp, sizeof(timestamp), "%H:%M:%S", localTime);
     return std::string(timestamp);
+}
+
+void Monitor::sampleTopProcess() {
+    DWORD processIds[1024];
+    DWORD bytesReturned;
+
+    if (!EnumProcesses(processIds, sizeof(processIds), &bytesReturned))
+        return;
+
+    int processCount = bytesReturned / sizeof(DWORD);
+
+    double peakMemory = 0.0;
+    std::string peakName = "Unknown";
+
+    for (int i = 0; i < processCount; i++) {
+        DWORD pid = processIds[i];
+        if (pid == 0) continue;
+
+        HANDLE hProcess = OpenProcess(
+            PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid
+        );
+        if (!hProcess) continue;
+
+        PROCESS_MEMORY_COUNTERS pmc;
+        if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
+            double memMB = pmc.WorkingSetSize / (1024.0 * 1024.0);
+
+            if (memMB > peakMemory) {
+                peakMemory = memMB;
+
+                char nameBuffer[MAX_PATH];
+                if (GetProcessImageFileNameA(hProcess, nameBuffer, MAX_PATH)) {
+                    std::string fullPath(nameBuffer);
+                    size_t pos = fullPath.rfind('\\');
+                    peakName = (pos != std::string::npos)
+                                ? fullPath.substr(pos + 1)
+                                : fullPath;
+                }
+            }
+        }
+
+        CloseHandle(hProcess);
+    }
+
+    topProcess.name     = peakName;
+    topProcess.memoryMB = peakMemory;
 }

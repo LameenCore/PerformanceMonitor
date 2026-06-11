@@ -6,7 +6,6 @@
 #include "../include/SessionReport.h"
 #include "../include/BottleneckReport.h"
 
-// Global flag — signal handler sets this to false on Ctrl+C
 bool running = true;
 
 void handleSignal(int signal) {
@@ -26,22 +25,20 @@ int main() {
         std::cout << "\nLogging to monitor.log" << std::endl;
         std::cout << "Sampling every 1 second. Press Ctrl+C to stop.\n" << std::endl;
 
-        // Register signal handler
         signal(SIGINT, handleSignal);
 
         Monitor monitor(80.0, 85.0);
         BottleneckReport report;
 
-        // Seed baseline
         monitor.sample();
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
         while (running) {
             monitor.sample();
+            monitor.sampleTopProcess();
             monitor.printStats();
             monitor.log();
 
-            // Update bottleneck report
             report.update(
                 monitor.getCpu(),
                 monitor.getMem(),
@@ -53,7 +50,6 @@ int main() {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
-        // Print report when Ctrl+C is pressed
         report.print();
     }
     else if (choice == 2) {
