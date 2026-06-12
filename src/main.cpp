@@ -51,6 +51,8 @@ int main() {
         }
 
         report.print();
+        report.exportTxt();
+        report.exportHtml();
     }
     else if (choice == 2) {
         std::string file1, file2;

@@ -1,0 +1,7 @@
+===== Bottleneck Report =====
+Total Samples:    10
+Peak CPU:         81.4453% at 09:48:19
+Peak Memory:      91% at 09:48:14
+CPU Breaches:     1
+Memory Breaches:  10
+=============================

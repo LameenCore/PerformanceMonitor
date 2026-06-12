@@ -14,4 +14,6 @@ public:
     BottleneckReport();
     void update(double cpu, double mem, bool cpuAlert, bool memAlert, std::string timestamp);
     void print();
+    void exportTxt(std::string filename = "report.txt");
+    void exportHtml(std::string filename = "report.html");
 };
