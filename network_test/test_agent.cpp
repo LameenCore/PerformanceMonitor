@@ -29,7 +29,7 @@ int main() {
 
     // Step 4 — Send fake data every second
     int count = 1;
-    while (count <= 10) {
+    while (count <= 10) {t
         std::string message = "CPU:23." + std::to_string(count) 
                             + "|MEM:85";
         send(agentSocket, message.c_str(), message.size(), 0);

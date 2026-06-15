@@ -36,5 +36,7 @@ public:
     double      getMem()       { return memUsage; }
     bool        isCpuAlert()   { return cpuAlert; }
     bool        isMemAlert()   { return memAlert; }
+    std::string getTopProcessName() { return topProcess.name; }
+    double      getTopProcessMem()  { return topProcess.memoryMB; } 
     std::string getTimestamp();
 };
