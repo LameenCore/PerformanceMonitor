@@ -14,7 +14,7 @@ int main() {
     sqlite3* db;
     char* errMsg = nullptr;
 
-    int result = sqlite3_open("test.db", &db);
+    int result = sqlite3_open("bin/test.db", &db);
     if (result != SQLITE_OK) {
         std::cout << "Could not open database!" << std::endl;
         return 1;
