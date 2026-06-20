@@ -13,7 +13,8 @@ std::string buildPacket(Monitor& monitor) {
     return "CPU:"     + std::to_string(monitor.getCpu())
          + "|MEM:"    + std::to_string(monitor.getMem())
          + "|PROC:"   + monitor.getTopProcessName()
-         + "|PROCMEM:"+ std::to_string(monitor.getTopProcessMem());
+         + "|PROCMEM:"+ std::to_string(monitor.getTopProcessMem())
+         + "\n";
 }
 
 int main() {

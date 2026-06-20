@@ -26,3 +26,4 @@ int main() {
     sqlite3_close(db);
     return 0;
 }
+
