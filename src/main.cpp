@@ -29,6 +29,7 @@ int main() {
 
         Monitor monitor(80.0, 85.0);
         BottleneckReport report;
+        report.setThresholds(80.0, 85.0);
 
         monitor.sample();
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -40,12 +41,14 @@ int main() {
             monitor.log();
 
             report.update(
-                monitor.getCpu(),
-                monitor.getMem(),
-                monitor.isCpuAlert(),
-                monitor.isMemAlert(),
-                monitor.getTimestamp()
-            );
+            monitor.getCpu(),
+            monitor.getMem(),
+            monitor.isCpuAlert(),
+            monitor.isMemAlert(),
+            monitor.getTimestamp(),
+            monitor.getTopProcessName(),
+            monitor.getTopProcessMem()
+        );
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
