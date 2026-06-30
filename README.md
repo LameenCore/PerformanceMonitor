@@ -5,6 +5,16 @@ A C++ tool for Windows that watches CPU and memory usage in real time, flags thr
 ![Language](https://img.shields.io/badge/language-C%2B%2B-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
+## Demo
+
+**Console output** — color-coded live readings with warnings and top process:
+
+![Console demo](Screenshot_demo/screenshots_console.png)
+
+**HTML dashboard** — exported at the end of each session:
+
+![Dashboard demo](Screenshot_demo/screenshot_dashboard.png)
+
 ## Features
 
 **Core monitoring**
